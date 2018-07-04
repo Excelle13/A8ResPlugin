@@ -1,2 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.ttebd.a8ResPlugin" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"><name>A8ResPlugin</name><js-module name="A8ResPlugin" src="www/A8ResPlugin.js"><clobbers target="cordova.plugins.A8ResPlugin" /></js-module><platform name="android"><config-file parent="/*" target="res/xml/config.xml"><feature name="A8ResPlugin"><param name="android-package" value="com.ttebd.a8ResPlugin.A8ResPlugin" /></feature></config-file><config-file parent="/*" target="AndroidManifest.xml"></config-file><source-file src="src/android/A8ResPlugin.java" target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" /></platform></plugin>
+<plugin xmlns:android="http://schemas.android.com/apk/res/android" id="com.ttebd.a8ResPlugin"
+    version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0">
+    <name>A8ResPlugin</name>
+    <js-module name="A8ResPlugin" src="www/A8ResPlugin.js">
+        <clobbers target="cordova.plugins.A8ResPlugin" />
+    </js-module>
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="A8ResPlugin">
+                <param name="android-package" value="com.ttebd.a8ResPlugin.A8ResPlugin" />
+            </feature>
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml"></config-file>
+        <source-file src="src/android/A8ResPlugin.java"
+            target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
+        <source-file src="src/android/DeviceBase.java"
+            target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
+        <source-file src="src/android/PrinterMain.java"
+            target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
+    </platform>
+</plugin>
