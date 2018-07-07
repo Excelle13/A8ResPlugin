@@ -1,48 +1,69 @@
 package com.ttebd.a8ResPlugin;
 
-import android.util.Log;
+import android.os.Environment;
 
-import com.ttebd.a8ResPlugin.PrinterMain;
+import com.landicorp.android.eptapi.device.Beeper;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * This class echoes a string called from JavaScript.
- *
- *
- */
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import de.mindpipe.android.logging.log4j.LogConfigurator;
 
-//sourceSets {
-//        main {
-//        jniLibs.srcDirs = ['libs']
-//        }}
 public class A8ResPlugin extends CordovaPlugin {
-    public static final String TAG = "A8ResPlugin";
-
+    com.ttebd.a8ResPlugin.LogUtil logUtil = new com.ttebd.a8ResPlugin.LogUtil();
+    boolean falg = false;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-//        if (action.equals("coolMethod")) {
-//            String message = args.getString(0);
-//            this.coolMethod(message, callbackContext);
-//            return true;
-//        }
-//        return false;
 
         switch (action) {
             case "coolMethod":
-                Log.e(TAG, "execute coolMethod");
-                this.coolMethod(args.getString(0), callbackContext);
-                this.doPrint(args, callbackContext);
+//                Log.e(TAG, "execute coolMethod");
+                System.out.println("JSONArray---1-"+args.getString(0));
+                System.out.println("JSONArray---2-"+args.getString(1));
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        new com.ttebd.a8ResPlugin.DeviceBase().bindDeviceService(cordova.getActivity());
+                        Beeper.startBeep(100);
+                        logUtil.info("TestInfo", "测试日志打印");
+                        logUtil.error("TestInfo", "测试日志打印");
+                        logUtil.debug("TestInfo", "测试日志打印");
+                        logUtil.warn("TestInfo", "测试日志打印");
+//        this.testLog();
+
+
+                        new com.ttebd.a8ResPlugin.DeviceBase().unbindDeviceService();
+
+                        try {
+                            coolMethod(args.getString(0), callbackContext);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 return true;
-            case "getExtras":
-//        this.getExtras(callbackContext);
+            case "logInfo":
+                logUtil.info(args.getString(0), "");
+                return true;
+            case "logDebug":
+//                this.getExtras(callbackContext);
+                return true;
+            case "logWarn":
+//                this.getExtras(callbackContext);
+                return true;
+            case "logError":
+//                this.getExtras(callbackContext);
                 return true;
             case "doPrint":
                 this.doPrint(args, callbackContext);
@@ -52,7 +73,7 @@ public class A8ResPlugin extends CordovaPlugin {
     }
 
     // 测试方法
-    private void coolMethod(String message, CallbackContext callbackContext) {
+    public void coolMethod(String message, CallbackContext callbackContext) {
         if (message != null && message.length() > 0) {
             callbackContext.success(message);
         } else {
@@ -62,16 +83,12 @@ public class A8ResPlugin extends CordovaPlugin {
 
     //    打印
     private void doPrint(JSONArray message, CallbackContext callbackContext) {
-
-        PrinterMain.bindDeviceService(this.cordova.getActivity());
-
-
-        PrinterMain printerMain = new PrinterMain();
-        printerMain.init();
-//    printerMain.addText();
-        printerMain.addBarcode();
-        printerMain.startPrint();
-
-
+        if (message != null && message.length() > 0) {
+            callbackContext.success(message);
+        } else {
+            callbackContext.error("Expected one non-empty string argument.");
+        }
     }
+
+
 }

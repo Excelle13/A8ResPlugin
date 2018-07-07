@@ -18,5 +18,7 @@
             target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
         <source-file src="src/android/PrinterMain.java"
             target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
+          <source-file src="src/android/LogUtil.java"
+            target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
     </platform>
 </plugin>
