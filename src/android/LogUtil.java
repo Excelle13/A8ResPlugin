@@ -16,12 +16,12 @@ public class LogUtil {
 
     private static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
     private static final String DEFAULT_LOG_DIR = Environment.getExternalStorageDirectory()
-            + File.separator + "myc" + File.separator + "log"
+            + File.separator + "IPOS" + File.separator + "log"
             + File.separator;
     private static final String DEFAULT_LOG_FILE_NAME = "MyApp.log";
     private static final String TAG = "Log4jConfigure";
     // 对应AndroidManifest文件中的package
-    private static final String PACKAGE_NAME = "com.king.logtest";
+    private static final String PACKAGE_NAME = "com.ttebd.logtest";
     private static final Logger logger = Logger.getLogger("dfghj");
     final Logger root = Logger.getRootLogger(); // 获取跟日志级别
 
@@ -31,6 +31,9 @@ public class LogUtil {
     SimpleDateFormat timeCompareTimeSdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
+    /**
+     *  log初始化
+     */
     public void init() {
 
         logConfigure();
@@ -47,6 +50,10 @@ public class LogUtil {
 
     }
 
+    /**
+     *  检测当天的log文件是否已经存在，若当天的存在，就续写当前，若不存在，新建新的log文件并写入
+     * @return
+     */
     public boolean checkLogFile() {
         nowTime = new Date();
         try {
@@ -81,7 +88,10 @@ public class LogUtil {
         return isTody;
     }
 
+
+    // 对比时间先后
     public boolean compare(String time1, String time2) throws ParseException {
+
         //如果想比较日期则写成"yyyy-MM-dd"就可以了
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         //将字符串形式的时间转化为Date类型的时间

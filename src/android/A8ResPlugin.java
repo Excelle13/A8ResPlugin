@@ -29,8 +29,9 @@ public class A8ResPlugin extends CordovaPlugin {
         switch (action) {
             case "coolMethod":
 //                Log.e(TAG, "execute coolMethod");
-                System.out.println("JSONArray---1-"+args.getString(0));
-                System.out.println("JSONArray---2-"+args.getString(1));
+                JSONObject params = args.getJSONObject(0);
+                System.out.println("JSONArray---1-" + params);
+                System.out.println("JSONArray---getString-" + params.getString("name"));
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -46,24 +47,28 @@ public class A8ResPlugin extends CordovaPlugin {
                         new com.ttebd.a8ResPlugin.DeviceBase().unbindDeviceService();
 
                         try {
-                            coolMethod(args.getString(0), callbackContext);
-                        } catch (JSONException e) {
+//                            coolMethod(args.getString(0), callbackContext);
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 });
                 return true;
             case "logInfo":
-                logUtil.info(args.getString(0), "");
+                JSONObject infoMessage = args.getJSONObject(0);
+                logUtil.info(infoMessage.getString("tag"), infoMessage.getString("message"));
                 return true;
             case "logDebug":
-//                this.getExtras(callbackContext);
+                JSONObject debugMessage = args.getJSONObject(0);
+                logUtil.debug(debugMessage.getString("tag"), debugMessage.getString("message"));
                 return true;
             case "logWarn":
-//                this.getExtras(callbackContext);
+                JSONObject warnMessage = args.getJSONObject(0);
+                logUtil.warn(warnMessage.getString("tag"), warnMessage.getString("message"));
                 return true;
             case "logError":
-//                this.getExtras(callbackContext);
+                JSONObject errorMessage = args.getJSONObject(0);
+                logUtil.error(errorMessage.getString("tag"), errorMessage.getString("message"));
                 return true;
             case "doPrint":
                 this.doPrint(args, callbackContext);
