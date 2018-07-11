@@ -16,7 +16,7 @@ public class LogUtil {
 
     private static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
     private static final String DEFAULT_LOG_DIR = Environment.getExternalStorageDirectory()
-            + File.separator + "IPOS" + File.separator + "log"
+            + File.separator + "CRLANDIPOSLog" + File.separator + "log"
             + File.separator;
     private static final String DEFAULT_LOG_FILE_NAME = "MyApp.log";
     private static final String TAG = "Log4jConfigure";

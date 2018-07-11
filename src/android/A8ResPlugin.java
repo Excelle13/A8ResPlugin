@@ -44,7 +44,7 @@ public class A8ResPlugin extends CordovaPlugin {
                     }
                 });
                 return true;
-            case "SalesSmallSummary":
+            case "printSalesSmallSummary":
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
