@@ -3,6 +3,7 @@ package com.ttebd.a8ResPlugin;
 import android.os.Environment;
 
 import com.landicorp.android.eptapi.device.Beeper;
+import com.landicorp.android.eptapi.device.Printer;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -21,6 +22,7 @@ import de.mindpipe.android.logging.log4j.LogConfigurator;
 
 public class A8ResPlugin extends CordovaPlugin {
     com.ttebd.a8ResPlugin.LogUtil logUtil = new com.ttebd.a8ResPlugin.LogUtil();
+    com.ttebd.a8ResPlugin.PrinterMain printerMain = new com.ttebd.a8ResPlugin.PrinterMain();
     boolean falg = false;
 
     @Override
@@ -28,29 +30,41 @@ public class A8ResPlugin extends CordovaPlugin {
 
         switch (action) {
             case "coolMethod":
-//                Log.e(TAG, "execute coolMethod");
+//             日志测试
                 JSONObject params = args.getJSONObject(0);
                 System.out.println("JSONArray---1-" + params);
-                System.out.println("JSONArray---getString-" + params.getString("name"));
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
-                        new com.ttebd.a8ResPlugin.DeviceBase().bindDeviceService(cordova.getActivity());
-                        Beeper.startBeep(100);
-                        logUtil.info("TestInfo", "测试日志打印");
-                        logUtil.error("TestInfo", "测试日志打印");
-                        logUtil.debug("TestInfo", "测试日志打印");
-                        logUtil.warn("TestInfo", "测试日志打印");
-//        this.testLog();
-
-
-                        new com.ttebd.a8ResPlugin.DeviceBase().unbindDeviceService();
-
+                        printerMain.printSales(cordova.getActivity(), args, callbackContext);
                         try {
-//                            coolMethod(args.getString(0), callbackContext);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }
+                });
+                return true;
+            case "SalesSmallSummary":
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printerMain.printSalesSmallSummary(cordova.getActivity(), args, callbackContext);
+                    }
+                });
+                return true;
+            case "printSales":
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printerMain.printSales(cordova.getActivity(), args, callbackContext);
+                    }
+                });
+                return true;
+            case "printSalesSummary":
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printerMain.printSalesSummary(cordova.getActivity(), args, callbackContext);
                     }
                 });
                 return true;
