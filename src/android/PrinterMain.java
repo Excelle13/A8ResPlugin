@@ -1,34 +1,26 @@
 package com.ttebd.a8ResPlugin;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.landicorp.android.eptapi.device.Beeper;
 import com.landicorp.android.eptapi.device.Printer;
+import com.landicorp.android.eptapi.device.Printer.Alignment;
 import com.landicorp.android.eptapi.device.Printer.Format;
 import com.landicorp.android.eptapi.exception.RequestException;
 import com.landicorp.android.eptapi.utils.QrCode;
-import com.landicorp.android.eptapi.device.Printer.Alignment;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.log4j.lf5.util.Resource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import io.ionic.starter2.R;
-
 import static com.landicorp.android.eptapi.device.Printer.Format.HZ_DOT16x16;
 import static com.landicorp.android.eptapi.device.Printer.Format.HZ_DOT24x24;
-import static com.landicorp.android.eptapi.device.Printer.Format.PIC_SC1x1;
-import static com.landicorp.android.eptapi.device.Printer.Format.PIC_SC2x2;
-import static com.landicorp.android.eptapi.device.Printer.Format.PIC_SC3x3;
 import static com.landicorp.android.eptapi.utils.QrCode.ECLEVEL_Q;
 
 public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
