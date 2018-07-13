@@ -435,7 +435,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                 for (int i = 0; i < qrCode.length(); i++) {
                     JSONObject item = qrCode.getJSONObject(i);
-                    printer.printQrCode(35,
+                    printer.printQrCode(40,
                             new QrCode(item.optString("qrValue"), ECLEVEL_Q),
                             300);
                     samllSamllFormat(format, printer);
@@ -465,11 +465,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     try {
                         successMessageObj.put("code", "0000");
                         successMessageObj.put("message", "打印成功");
-                        callbackContext.error(successMessageObj);
+                        callbackContext.success(successMessageObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    callbackContext.success();
                 } else {
 //          String errorDes = getDescribe(i);
                     String errMessage = printer.getErrorDescription(i);
@@ -477,7 +476,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     logUtil.info("printer", errMessage);
                     JSONObject errMessageObj = new JSONObject();
                     try {
-                        errMessageObj.put("code", "0000");
+                        errMessageObj.put("code", "0001");
                         errMessageObj.put("message", errMessage);
                         callbackContext.error(errMessageObj);
                     } catch (JSONException e) {
@@ -596,11 +595,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     try {
                         successMessageObj.put("code", "0000");
                         successMessageObj.put("message", "打印成功");
-                        callbackContext.error(successMessageObj);
+                        callbackContext.success(successMessageObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    callbackContext.success();
                 } else {
 //          String errorDes = getDescribe(i);
                     String errMessage = printer.getErrorDescription(i);
@@ -608,7 +606,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     logUtil.info("printer", errMessage);
                     JSONObject errMessageObj = new JSONObject();
                     try {
-                        errMessageObj.put("code", "0000");
+                        errMessageObj.put("code", "0001");
                         errMessageObj.put("message", errMessage);
                         callbackContext.error(errMessageObj);
                     } catch (JSONException e) {
@@ -715,11 +713,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     try {
                         successMessageObj.put("code", "0000");
                         successMessageObj.put("message", "打印成功");
-                        callbackContext.error(successMessageObj);
+                        callbackContext.success(successMessageObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    callbackContext.success();
                 } else {
 //          String errorDes = getDescribe(i);
                     String errMessage = printer.getErrorDescription(i);
@@ -727,7 +724,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     logUtil.info("printer", errMessage);
                     JSONObject errMessageObj = new JSONObject();
                     try {
-                        errMessageObj.put("code", "0000");
+                        errMessageObj.put("code", "0001");
                         errMessageObj.put("message", errMessage);
                         callbackContext.error(errMessageObj);
                     } catch (JSONException e) {

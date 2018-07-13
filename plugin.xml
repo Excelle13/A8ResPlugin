@@ -18,7 +18,12 @@
             target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
         <source-file src="src/android/PrinterMain.java"
             target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
-          <source-file src="src/android/LogUtil.java"
+        <source-file src="src/android/LogUtil.java"
             target-dir="src/com/ttebd/a8ResPlugin/A8ResPlugin" />
+        <lib-file arch="device" src="src/android/libs/android-logging-log4j-1.0.3.jar" />
+        <lib-file arch="device" src="src/android/libs/eptapilibrary.jar" />
+        <lib-file arch="device" src="src/android/libs/log4j-1.2.17.jar" />
+        <lib-file arch="device" src="src/android/libs/pinpad.jar" />
+
     </platform>
 </plugin>
