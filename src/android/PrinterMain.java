@@ -362,6 +362,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 JSONArray qrCode = params.getJSONArray("arCode");
                 JSONArray barCode = params.getJSONArray("barCode");
                 JSONArray tips = params.getJSONArray("tips");
+                String reprint = params.optString("reprint");
 
 
                 /** 设置打印格式 */
@@ -371,6 +372,9 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 printImg(context, printer);
+                if (reprint.length() > 0) {
+                    printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
+                }
                 samllFormatLine(format, printer);
                 samllFormat(format, printer);
 // 店铺信息
@@ -521,6 +525,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                 JSONArray storeInfo = params.getJSONArray("storeInfo");
                 JSONArray saleSummaries = params.getJSONArray("saleSummaries");
+                String reprint = params.optString("reprint");
 
 
                 /** 设置打印格式 */
@@ -533,6 +538,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 //        printer.printText(Alignment.CENTER, "============销售总结============\n");
 //        printer.printText("============销售总结============\n");
                 printer.printText("            销售总结            \n");
+                if (reprint.length() > 0) {
+                    printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
+                }
+
                 samllFormat(format, printer);
                 samllFormatLine(format, printer);
 
@@ -654,6 +663,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 String billTotal = params.getString("billTotal");
                 JSONArray payment = params.getJSONArray("payment");
                 String paymentTotal = params.getString("paymentTotal");
+                String reprint = params.optString("reprint");
 
 
                 /** 设置打印格式 */
@@ -664,12 +674,23 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                 printImg(context, printer);
                 printer.printText("            销售小结            \n");
+                if (reprint.length() > 0) {
+                    printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
+                }
                 samllFormat(format, printer);
                 samllFormatLine(format, printer);
                 for (int i = 0; i < storeInfo.length(); i++) {
-                    JSONObject item = storeInfo.getJSONObject(i);
-                    printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
-                    printer.printText("\n");
+
+                    if (i == 0) {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    } else {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    }
+
                 }
                 printDate(printer);
                 samllFormatLine(format, printer);
