@@ -372,6 +372,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 printImg(context, printer);
+                printer.printText("             销售单            \n");
+
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -379,9 +381,16 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 samllFormat(format, printer);
 // 店铺信息
                 for (int i = 0; i < storeInfo.length(); i++) {
-                    JSONObject item = storeInfo.getJSONObject(i);
-                    printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
-                    printer.printText("\n");
+
+                    if (i == 0) {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    } else {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    }
                 }
                 printDate(printer);
 // 条形码
@@ -435,8 +444,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 }
                 samllFormatLine(format, printer);
 //        printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
-
-
                 for (int i = 0; i < qrCode.length(); i++) {
                     JSONObject item = qrCode.getJSONObject(i);
                     printer.printQrCode(40,
@@ -473,8 +480,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    unbindDeviceService();
                 } else {
-//          String errorDes = getDescribe(i);
                     String errMessage = printer.getErrorDescription(i);
                     Log.e("printer", "print failed：" + errMessage);
                     logUtil.info("printer", errMessage);
@@ -486,8 +493,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    unbindDeviceService();
                 }
-
             }
 
             @Override
@@ -503,7 +510,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         } catch (RequestException e) {
             e.printStackTrace();
         }
-
 
     }
 
@@ -546,9 +552,16 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 samllFormatLine(format, printer);
 
                 for (int x = 0; x < storeInfo.length(); x++) {
-                    JSONObject storeInfos = storeInfo.getJSONObject(x);
-                    printer.printText(String.format("%-20s%24s", storeInfos.optString("storeInfoName"), storeInfos.optString("storeInfoValue")));
-                    printer.printText("\n");
+
+                    if (x == 0) {
+                        JSONObject item = storeInfo.getJSONObject(x);
+                        printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    } else {
+                        JSONObject item = storeInfo.getJSONObject(x);
+                        printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    }
                 }
                 printDate(printer);
 
@@ -608,8 +621,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    unbindDeviceService();
                 } else {
-//          String errorDes = getDescribe(i);
                     String errMessage = printer.getErrorDescription(i);
                     Log.e("printer", "print failed：" + errMessage);
                     logUtil.info("printer", errMessage);
@@ -621,6 +634,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    unbindDeviceService();
                 }
 
             }
@@ -738,8 +752,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    unbindDeviceService();
                 } else {
-//          String errorDes = getDescribe(i);
                     String errMessage = printer.getErrorDescription(i);
                     Log.e("printer", "print failed：" + errMessage);
                     logUtil.info("printer", errMessage);
@@ -751,6 +765,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    unbindDeviceService();
                 }
 
             }
@@ -767,6 +782,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
             progress.start();
         } catch (RequestException e) {
             e.printStackTrace();
+            unbindDeviceService();
         }
 
     }
