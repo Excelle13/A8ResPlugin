@@ -372,8 +372,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 printImg(context, printer);
-                printer.printText("             销售单            \n");
-
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -381,6 +379,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 samllFormat(format, printer);
 // 店铺信息
                 for (int i = 0; i < storeInfo.length(); i++) {
+
 
                     if (i == 0) {
                         JSONObject item = storeInfo.getJSONObject(i);
@@ -444,6 +443,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 }
                 samllFormatLine(format, printer);
 //        printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
+
+
                 for (int i = 0; i < qrCode.length(); i++) {
                     JSONObject item = qrCode.getJSONObject(i);
                     printer.printQrCode(40,
@@ -495,6 +496,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     }
                     unbindDeviceService();
                 }
+
             }
 
             @Override
@@ -510,6 +512,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         } catch (RequestException e) {
             e.printStackTrace();
         }
+
 
     }
 
@@ -670,6 +673,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 printer.setAutoTrunc(false);
 
                 // 获取小票主要信息对象
+
                 JSONObject params = args.getJSONObject(0);
 
                 JSONArray storeInfo = params.getJSONArray("storeInfo");
@@ -704,7 +708,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                         printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
                         printer.printText("\n");
                     }
-
                 }
                 printDate(printer);
                 samllFormatLine(format, printer);
