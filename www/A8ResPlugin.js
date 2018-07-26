@@ -28,6 +28,15 @@ exports.printSales = function (arg0, success, error) {
 exports.printSalesSummary = function (arg0, success, error) {
     exec(success, error, 'A8ResPlugin', 'printSalesSummary', [arg0]);
 };
+exports.printReturnGood = function (arg0, success, error) {
+    exec(success, error, 'A8ResPlugin', 'printReturnGood', [arg0]);
+};
+exports.printSalesReport = function (arg0, success, error) {
+    exec(success, error, 'A8ResPlugin', 'printSalesReport', [arg0]);
+};
+exports.printSalesSlip = function (arg0, success, error) {
+    exec(success, error, 'A8ResPlugin', 'printSalesSlip', [arg0]);
+};
 
 
 

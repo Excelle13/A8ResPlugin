@@ -31,13 +31,14 @@ public class A8ResPlugin extends CordovaPlugin {
     com.ttebd.a8ResPlugin.PrinterMain printerMain = new com.ttebd.a8ResPlugin.PrinterMain();
     private static Activity activity = null;
 
+
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
         if (activity == null) {
             activity = this.cordova.getActivity();
             Log.d("a8ResPlugin", "初始化！");
-//      logUtil.info("a8ResPlugin", "初始化！");
+            logUtil.info("a8ResPlugin", "初始化！");
         }
 
 
@@ -84,6 +85,15 @@ public class A8ResPlugin extends CordovaPlugin {
                     bindDeviceService(activity.getApplicationContext());
                     try {
                         switch (action) {
+                            case "printReturnGood":
+                                printerMain.printReturnGood(activity.getApplicationContext(), args, callbackContext);
+                                break;
+                            case "printSalesReport":
+                                printerMain.printSalesReport(activity.getApplicationContext(), args, callbackContext);
+                                break;
+                            case "printSalesSlip":
+                                printerMain.printSalesSlip(activity.getApplicationContext(), args, callbackContext);
+                                break;
                             case "printSalesSmallSummary":
                                 printerMain.printSalesSmallSummary(activity.getApplicationContext(), args, callbackContext);
                                 break;
@@ -106,6 +116,7 @@ public class A8ResPlugin extends CordovaPlugin {
         } catch (Exception e) {
             logUtil.debug("JsInterface (Exception)", e.getLocalizedMessage());
         }
+
         return false;
     }
 

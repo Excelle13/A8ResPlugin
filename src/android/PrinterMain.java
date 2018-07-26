@@ -29,57 +29,322 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
     com.ttebd.a8ResPlugin.LogUtil logUtil = new com.ttebd.a8ResPlugin.LogUtil();
 
 
-    // 获取打印机错误代码表示的信息
-    public String getDescribe(int error) {
-        switch (error) {
-            case com.landicorp.android.eptapi.device.Printer.ERROR_BMBLACK:
-                String s = printer.getErrorDescription(error);
-                return "ERROR_BMBLACK";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_BUFOVERFLOW:
-                return "ERROR_BUFOVERFLOW";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_BUSY:
-                return "ERROR_BUSY";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_COMMERR:
-                return "ERROR_COMMERR";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_CUTPOSITIONERR:
-                return "ERROR_CUTPOSITIONERR";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_HARDERR:
-                return "ERROR_HARDERR";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_LIFTHEAD:
-                return "ERROR_LIFTHEAD";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_LOWTEMP:
-                return "ERROR_LOWTEMP";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_LOWVOL:
-                return "ERROR_LOWVOL";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_MOTORERR:
-                return "ERROR_MOTORERR";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_NOBM:
-                return "ERROR_NOBM";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_NONE:
-                return "ERROR_NONE";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_OVERHEAT:
-                return "ERROR_OVERHEAT";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_PAPERENDED:
-                return "ERROR_PAPERENDED";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_PAPERENDING:
-                return "ERROR_PAPERENDING";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_PAPERJAM:
-                return "ERROR_PAPERJAM";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_PENOFOUND:
-                return "ERROR_PENOFOUND";
-            case com.landicorp.android.eptapi.device.Printer.ERROR_WORKON:
-                return "ERROR_WORKON";
-            case Printer.ERROR_CUTCLEAN:
-                return "ERROR_CUTCLEAN";
-            case Printer.ERROR_CUTERROR:
-                return "ERROR_CUTERROR";
-            case Printer.ERROR_CUTFAULT:
-                return "ERROR_CUTFAULT";
-            case Printer.ERROR_OPENCOVER:
-                return "ERROR_OPENCOVER";
-            default:
-                return "UNKNOWN ERROR";
+    /**
+     * 退货小票
+     *
+     * @param context
+     * @param args
+     * @param callbackContext
+     */
+    public void printReturnGood(Context context, JSONArray args, CallbackContext callbackContext) {
+        System.out.println(args);
+        progress = new Printer.Progress() {
+            @Override
+            public void doPrint(Printer printer) throws Exception {
+
+                printer.setAutoTrunc(false);
+
+                // 获取小票主要信息对象
+                JSONObject params = args.getJSONObject(0);
+                JSONArray storeInfo = params.getJSONArray("storeInfo");
+                JSONArray payment = params.getJSONArray("payment");
+                JSONArray goods = params.getJSONArray("goods");
+                String reprint = params.optString("reprint");
+                String refundAmount = params.optString("refundAmount");
+                String totalAmount = params.optString("totalAmount");
+                JSONArray tips = params.getJSONArray("tips");
+                JSONArray orderNo = params.getJSONArray("orderNo");
+                JSONArray barCode = params.getJSONArray("barCode");
+
+                /** 设置打印格式 */
+                Format format = new Format();
+                /** 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题  */
+                format.setAscSize(Format.ASC_DOT7x7);
+                format.setAscScale(Format.ASC_SC1x2);
+
+// 打印图片
+                printImg(context, printer);
+                printer.printText("              退货             \n");
+                if (reprint.length() > 0) {
+                    printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
+                }
+                samllFormatLine(format, printer);
+
+// 店铺信息
+                samllFormat(format, printer);
+                for (int i = 0; i < storeInfo.length(); i++) {
+                    if (i == 0) {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    } else {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    }
+                }
+                samllFormatLine(format, printer);
+
+// 条形码
+                for (int i = 0; i < barCode.length(); i++) {
+                    JSONObject item = barCode.getJSONObject(i);
+                    printer.printBarCode(Alignment.CENTER, item.optString("barCodeValue"));
+                    format.setAscSize(Format.ASC_DOT7x7);
+                    format.setAscScale(Format.ASC_SC1x2);
+                    generalFormat(format, printer);
+                    printer.printText(String.format("%28s", item.optString("barCodeTitle")));
+                    printer.printText("\n");
+                }
+                samllFormatLine(format, printer);
+
+// 商品
+                generalFormat(format, printer);
+                printer.printText(String.format("%-12s%3s%11s", "货号", "数量", "金额(RMB)\n"));
+                samllFormat(format, printer);
+
+                for (int i = 0; i < goods.length(); i++) {
+                    JSONObject item = goods.getJSONObject(i);
+                    printer.printText(
+                            String.format("%-" + (24 + formatPrintText(item.optString("goodCode"))) + "s%7s%19s", item.optString("goodCode"), item.optString("goodSum"), item.optString("amount")));
+                    printer.printText("\n");
+                }
+                samllFormatLine(format, printer);
+
+                printer.printText(String.format("%-20s%27s", "合计", totalAmount + "\n"));
+                printer.printText(String.format("%-18s%27s", "退款金额", refundAmount + "\n"));
+                samllFormatLine(format, printer);
+
+// 付款方式
+                generalFormat(format, printer);
+                printer.printText(String.format("%-15s%11s", "退款方式", "金额(RMB)\n"));
+                samllFormat(format, printer);
+                for (int i = 0; i < payment.length(); i++) {
+                    JSONObject item = payment.getJSONObject(i);
+                    printer.printText(String.format("%-" + (15 + formatPrintText(item.optString("paymentMethod"))) + "s%7s%18s", item.optString("paymentMethod"), item.optString("paymentSum"), item.optString("paymentAmount")));
+                    printer.printText("\n");
+                }
+                samllFormatLine(format, printer);
+
+// 订单号
+                generalFormat(format, printer);
+//        printer.printText(String.format("%-15s%11s", "退款方式", "金额(RMB)\n"));
+                samllFormat(format, printer);
+                for (int i = 0; i < orderNo.length(); i++) {
+                    JSONObject item = orderNo.getJSONObject(i);
+//          System.out.println("item-------"+item);
+                    printer.printText(String.format("%-" + (15 + formatPrintText(item.optString("orderInfoKey"))) + "s%s%25s", item.optString("orderInfoKey"), item.optString("paymentSum"), item.optString("orderInfoValue")));
+                    printer.printText("\n");
+                }
+                samllFormatLine(format, printer);
+
+// tips
+                samllSamllFormat(format, printer);
+                for (int i = 0; i < tips.length(); i++) {
+                    JSONObject item = tips.getJSONObject(i);
+                    printer.printText(Alignment.LEFT, item.optString("tipsId") + "." + item.optString("article") + "\n");
+                }
+
+                printer.feedLine(5);
+                generalFormat(format, printer);
+            }
+
+            @Override
+            public void onFinish(int i) {
+                printFinish(i, callbackContext);
+            }
+
+            @Override
+            public void onCrash() {
+
+            }
+        };
+        try {
+            Beeper.startBeep(100);
+            progress.start();
+        } catch (RequestException e) {
+            e.printStackTrace();
         }
+
+    }
+
+    /**
+     * 销售报表
+     *
+     * @param context
+     * @param args
+     * @param callbackContext
+     */
+    public void printSalesReport(Context context, JSONArray args, CallbackContext callbackContext) {
+        progress = new Printer.Progress() {
+            @Override
+            public void doPrint(Printer printer) throws Exception {
+
+                printer.setAutoTrunc(false);
+
+                // 获取小票主要信息对象
+                JSONObject params = args.getJSONObject(0);
+
+                JSONArray storeInfo = params.getJSONArray("storeInfo");
+                JSONArray payment = params.getJSONArray("payment");
+                String reprint = params.optString("reprint");
+                String paymentTotal = params.optString("paymentTotal");
+
+                /** 设置打印格式 */
+                Format format = new Format();
+                /** 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题  */
+                format.setAscSize(Format.ASC_DOT7x7);
+                format.setAscScale(Format.ASC_SC1x2);
+
+                printImg(context, printer);
+                printer.printText("            销售报表            \n");
+                if (reprint.length() > 0) {
+                    printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
+                }
+                samllFormatLine(format, printer);
+                samllFormat(format, printer);
+// 店铺信息
+                for (int i = 0; i < storeInfo.length(); i++) {
+                    if (i == 0) {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    } else {
+                        JSONObject item = storeInfo.getJSONObject(i);
+                        printer.printText(String.format("%-20s%24s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
+                        printer.printText("\n");
+                    }
+                }
+                printDate(printer);
+                samllFormatLine(format, printer);
+                generalFormat(format, printer);
+                printer.printText(String.format("%-8s%s%11s", "付款方式", "单据数量", "金额(RMB)\n"));
+                samllFormat(format, printer);
+                for (int i = 0; i < payment.length(); i++) {
+                    JSONObject item = payment.getJSONObject(i);
+                    printer.printText(String.format("%-" + (15 + formatPrintText(item.optString("paymentMethod"))) + "s%7s%18s", item.optString("paymentMethod"), item.optString("paymentSum"), item.optString("paymentAmount")));
+                    printer.printText("\n");
+                }
+                printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
+
+                printer.feedLine(3);
+                generalFormat(format, printer);
+
+            }
+
+            @Override
+            public void onFinish(int i) {
+                printFinish(i, callbackContext);
+            }
+
+            @Override
+            public void onCrash() {
+
+            }
+        };
+
+        try {
+            Beeper.startBeep(100);
+            progress.start();
+        } catch (RequestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 银行签购单
+     *
+     * @param context
+     * @param args
+     * @param callbackContext
+     */
+    public void printBankSalesSlip(Context context, JSONArray args, CallbackContext callbackContext) {
+        progress = new Printer.Progress() {
+            @Override
+            public void doPrint(Printer printer) throws Exception {
+
+                printer.setAutoTrunc(false);
+
+                // 获取小票主要信息对象
+                JSONObject params = args.getJSONObject(0);
+                JSONArray salesSlip = params.getJSONArray("salesSlip");
+                String salesSlipType = params.optString("salesSlipType");
+
+
+                /** 设置打印格式 */
+                Format format = new Format();
+                /** 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题  */
+                format.setAscSize(Format.ASC_DOT7x7);
+                format.setAscScale(Format.ASC_SC1x2);
+
+//        generalFormat(format, printer);
+
+                printer.printText("           "+salesSlipType+"签购单         \n");
+                samllFormatLine(format, printer);
+
+                generalFormat(format, printer);
+                for (int i = 0; i < salesSlip.length(); i++) {
+                    JSONObject item = salesSlip.getJSONObject(i);
+                    printer.printText(Alignment.LEFT, item.optString("salesSlipKey")+":"+item.optString("salesSlipValue")+"\n");
+                }
+
+//        printer.printText(Alignment.LEFT, "备注：");
+//        printer.feedLine(2);
+                printer.printText(Alignment.LEFT, "顾客签名：");
+                printer.feedLine(1);
+                samllFormat(format, printer);
+                printer.printText(Alignment.CENTER, "- - - - - - x - - - - - - - - - - - x - - - - - \n");
+                printer.feedLine(3);
+                generalFormat(format, printer);
+
+
+// 打印图片
+//        printImg(context, printer);
+            }
+
+            @Override
+            public void onFinish(int i) {
+//        printFinish(i, callbackContext);
+                Log.e("打印银行签购单", "完成打印");
+
+                if (i == com.landicorp.android.eptapi.device.Printer.ERROR_NONE) {
+                    logUtil.info("printer", "printer success");
+                    Log.e("printer", "print success");
+                    JSONObject successMessageObj = new JSONObject();
+                    try {
+                        successMessageObj.put("code", "0000");
+                        successMessageObj.put("message", "打印成功");
+                        callbackContext.success(successMessageObj);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    String errMessage = printer.getErrorDescription(i);
+                    Log.e("printer", "print failed：" + errMessage);
+                    logUtil.info("printer", errMessage);
+                    JSONObject errMessageObj = new JSONObject();
+                    try {
+                        errMessageObj.put("code", "0001");
+                        errMessageObj.put("message", errMessage);
+                        callbackContext.error(errMessageObj);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onCrash() {
+
+            }
+        };
+
+        try {
+            Beeper.startBeep(100);
+            progress.start();
+        } catch (RequestException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -98,7 +363,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                 // 获取小票主要信息对象
                 JSONObject params = args.getJSONObject(0);
-
                 JSONArray storeInfo = params.getJSONArray("storeInfo");
                 JSONArray goods = params.getJSONArray("goods");
                 JSONArray money = params.getJSONArray("money");
@@ -122,10 +386,9 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 }
                 samllFormatLine(format, printer);
                 samllFormat(format, printer);
+
 // 店铺信息
                 for (int i = 0; i < storeInfo.length(); i++) {
-
-
                     if (i == 0) {
                         JSONObject item = storeInfo.getJSONObject(i);
                         printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
@@ -170,10 +433,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 }
                 samllFormatLine(format, printer);
 
+// 付款方式
                 generalFormat(format, printer);
                 printer.printText(String.format("%-15s%11s", "付款方式", "金额(RMB)\n"));
                 samllFormat(format, printer);
-// 付款方式
                 for (int i = 0; i < payment.length(); i++) {
                     JSONObject item = payment.getJSONObject(i);
                     printer.printText(String.format("%-" + (15 + formatPrintText(item.optString("paymentMethod"))) + "s%7s%18s", item.optString("paymentMethod"), item.optString("paymentSum"), item.optString("paymentAmount")));
@@ -199,7 +462,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     printer.printText(Alignment.CENTER, item.optString("qrTitle") + "\n");
                 }
                 samllFormatLine(format, printer);
-
+                // tips
                 samllSamllFormat(format, printer);
                 for (int i = 0; i < tips.length(); i++) {
                     JSONObject item = tips.getJSONObject(i);
@@ -215,31 +478,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
             @Override
             public void onFinish(int i) {
-                if (i == com.landicorp.android.eptapi.device.Printer.ERROR_NONE) {
-                    logUtil.info("printer", "printer success");
-                    Log.e("printer", "print success");
-                    JSONObject successMessageObj = new JSONObject();
-                    try {
-                        successMessageObj.put("code", "0000");
-                        successMessageObj.put("message", "打印成功");
-                        callbackContext.success(successMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String errMessage = printer.getErrorDescription(i);
-                    Log.e("printer", "print failed：" + errMessage);
-                    logUtil.info("printer", errMessage);
-                    JSONObject errMessageObj = new JSONObject();
-                    try {
-                        errMessageObj.put("code", "0001");
-                        errMessageObj.put("message", errMessage);
-                        callbackContext.error(errMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                printFinish(i, callbackContext);
             }
 
             @Override
@@ -253,9 +492,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         } catch (RequestException e) {
             e.printStackTrace();
         }
-
-
     }
+
 
     /**
      * 销售总结
@@ -354,31 +592,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
             @Override
             public void onFinish(int i) {
-                if (i == com.landicorp.android.eptapi.device.Printer.ERROR_NONE) {
-                    logUtil.info("printer", "printer success");
-                    Log.e("printer", "print success");
-                    JSONObject successMessageObj = new JSONObject();
-                    try {
-                        successMessageObj.put("code", "0000");
-                        successMessageObj.put("message", "打印成功");
-                        callbackContext.success(successMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String errMessage = printer.getErrorDescription(i);
-                    Log.e("printer", "print failed：" + errMessage);
-                    logUtil.info("printer", errMessage);
-                    JSONObject errMessageObj = new JSONObject();
-                    try {
-                        errMessageObj.put("code", "0001");
-                        errMessageObj.put("message", errMessage);
-                        callbackContext.error(errMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                printFinish(i, callbackContext);
             }
 
             @Override
@@ -392,8 +606,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         } catch (RequestException e) {
             e.printStackTrace();
         }
-
-
     }
 
     /**
@@ -473,38 +685,16 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
 
                 samllFormat(format, printer);
+
                 printer.printText(Alignment.CENTER, "- - - - - - x - - - - - - - - - - - x - - - - - \n");
 
                 printer.feedLine(3);
                 generalFormat(format, printer);
             }
 
-            @Override
+            //      @Override
             public void onFinish(int i) {
-                if (i == com.landicorp.android.eptapi.device.Printer.ERROR_NONE) {
-                    logUtil.info("printer", "printer success");
-                    Log.e("printer", "print success");
-                    JSONObject successMessageObj = new JSONObject();
-                    try {
-                        successMessageObj.put("code", "0000");
-                        successMessageObj.put("message", "打印成功");
-                        callbackContext.success(successMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String errMessage = printer.getErrorDescription(i);
-                    Log.e("printer", "print failed：" + errMessage);
-                    logUtil.info("printer", errMessage);
-                    JSONObject errMessageObj = new JSONObject();
-                    try {
-                        errMessageObj.put("code", "0001");
-                        errMessageObj.put("message", errMessage);
-                        callbackContext.error(errMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+//        printFinish(i, callbackContext);
             }
 
             @Override
@@ -518,16 +708,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         } catch (RequestException e) {
             e.printStackTrace();
         }
-
     }
 
-
-    /**
-     * 打印完成处理方法
-     */
-    public static void printFinish() {
-
-    }
 
     // 打印logo
     public static void printImg(Context context, Printer printer) {
@@ -615,5 +797,92 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
             e.printStackTrace();
         }
     }
+
+    // 获取打印机错误代码表示的信息
+    public String getDescribe(int error) {
+        switch (error) {
+            case com.landicorp.android.eptapi.device.Printer.ERROR_BMBLACK:
+                String s = printer.getErrorDescription(error);
+                return "ERROR_BMBLACK";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_BUFOVERFLOW:
+                return "ERROR_BUFOVERFLOW";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_BUSY:
+                return "ERROR_BUSY";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_COMMERR:
+                return "ERROR_COMMERR";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_CUTPOSITIONERR:
+                return "ERROR_CUTPOSITIONERR";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_HARDERR:
+                return "ERROR_HARDERR";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_LIFTHEAD:
+                return "ERROR_LIFTHEAD";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_LOWTEMP:
+                return "ERROR_LOWTEMP";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_LOWVOL:
+                return "ERROR_LOWVOL";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_MOTORERR:
+                return "ERROR_MOTORERR";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_NOBM:
+                return "ERROR_NOBM";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_NONE:
+                return "ERROR_NONE";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_OVERHEAT:
+                return "ERROR_OVERHEAT";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_PAPERENDED:
+                return "ERROR_PAPERENDED";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_PAPERENDING:
+                return "ERROR_PAPERENDING";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_PAPERJAM:
+                return "ERROR_PAPERJAM";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_PENOFOUND:
+                return "ERROR_PENOFOUND";
+            case com.landicorp.android.eptapi.device.Printer.ERROR_WORKON:
+                return "ERROR_WORKON";
+            case Printer.ERROR_CUTCLEAN:
+                return "ERROR_CUTCLEAN";
+            case Printer.ERROR_CUTERROR:
+                return "ERROR_CUTERROR";
+            case Printer.ERROR_CUTFAULT:
+                return "ERROR_CUTFAULT";
+            case Printer.ERROR_OPENCOVER:
+                return "ERROR_OPENCOVER";
+            default:
+                return "UNKNOWN ERROR";
+        }
+    }
+
+    /**
+     * 打印成功调用方法
+     *
+     * @param i
+     * @param callbackContext
+     */
+    public void printFinish(int i, CallbackContext callbackContext) {
+        if (i == com.landicorp.android.eptapi.device.Printer.ERROR_NONE) {
+            logUtil.info("printer", "printer success");
+            Log.e("printer", "print success");
+            JSONObject successMessageObj = new JSONObject();
+            try {
+                successMessageObj.put("code", "0000");
+                successMessageObj.put("message", "打印成功");
+                callbackContext.success(successMessageObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            String errMessage = printer.getErrorDescription(i);
+            Log.e("printer", "print failed：" + errMessage);
+            logUtil.info("printer", errMessage);
+            JSONObject errMessageObj = new JSONObject();
+            try {
+                errMessageObj.put("code", "0001");
+                errMessageObj.put("message", errMessage);
+                callbackContext.error(errMessageObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }
