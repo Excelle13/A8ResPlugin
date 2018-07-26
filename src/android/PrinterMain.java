@@ -238,7 +238,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
             @Override
             public void onCrash() {
-
+                System.out.println("onCrash");
             }
         };
 
@@ -257,7 +257,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
      * @param args
      * @param callbackContext
      */
-    public void printBankSalesSlip(Context context, JSONArray args, CallbackContext callbackContext) {
+    public void printSalesSlip(Context context, JSONArray args, CallbackContext callbackContext) {
         progress = new Printer.Progress() {
             @Override
             public void doPrint(Printer printer) throws Exception {
@@ -278,13 +278,13 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
 //        generalFormat(format, printer);
 
-                printer.printText("           "+salesSlipType+"签购单         \n");
+                printer.printText("           " + salesSlipType + "签购单         \n");
                 samllFormatLine(format, printer);
 
                 generalFormat(format, printer);
                 for (int i = 0; i < salesSlip.length(); i++) {
                     JSONObject item = salesSlip.getJSONObject(i);
-                    printer.printText(Alignment.LEFT, item.optString("salesSlipKey")+":"+item.optString("salesSlipValue")+"\n");
+                    printer.printText(Alignment.LEFT, item.optString("salesSlipKey") + ":" + item.optString("salesSlipValue") + "\n");
                 }
 
 //        printer.printText(Alignment.LEFT, "备注：");
@@ -303,33 +303,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
             @Override
             public void onFinish(int i) {
-//        printFinish(i, callbackContext);
-                Log.e("打印银行签购单", "完成打印");
-
-                if (i == com.landicorp.android.eptapi.device.Printer.ERROR_NONE) {
-                    logUtil.info("printer", "printer success");
-                    Log.e("printer", "print success");
-                    JSONObject successMessageObj = new JSONObject();
-                    try {
-                        successMessageObj.put("code", "0000");
-                        successMessageObj.put("message", "打印成功");
-                        callbackContext.success(successMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String errMessage = printer.getErrorDescription(i);
-                    Log.e("printer", "print failed：" + errMessage);
-                    logUtil.info("printer", errMessage);
-                    JSONObject errMessageObj = new JSONObject();
-                    try {
-                        errMessageObj.put("code", "0001");
-                        errMessageObj.put("message", errMessage);
-                        callbackContext.error(errMessageObj);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+                printFinish(i, callbackContext);
             }
 
             @Override
@@ -694,7 +668,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
             //      @Override
             public void onFinish(int i) {
-//        printFinish(i, callbackContext);
+                printFinish(i, callbackContext);
             }
 
             @Override
@@ -868,6 +842,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 callbackContext.success(successMessageObj);
             } catch (JSONException e) {
                 e.printStackTrace();
+            } finally {
+                unbindDeviceService();
             }
         } else {
             String errMessage = printer.getErrorDescription(i);
@@ -880,6 +856,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 callbackContext.error(errMessageObj);
             } catch (JSONException e) {
                 e.printStackTrace();
+            } finally {
+                unbindDeviceService();
             }
         }
     }

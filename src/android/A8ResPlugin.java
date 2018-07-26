@@ -107,7 +107,7 @@ public class A8ResPlugin extends CordovaPlugin {
                     } catch (Exception e) {
 
                     } finally {
-                        unbindDeviceService();
+//                        unbindDeviceService();
                     }
                 }
             };
