@@ -269,14 +269,13 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 JSONArray salesSlip = params.getJSONArray("salesSlip");
                 String salesSlipType = params.optString("salesSlipType");
 
-
-                /** 设置打印格式 */
+//      * 设置打印格式
                 Format format = new Format();
-                /** 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题  */
+//        * 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题
                 format.setAscSize(Format.ASC_DOT7x7);
                 format.setAscScale(Format.ASC_SC1x2);
 
-//        generalFormat(format, printer);
+                generalFormat(format, printer);
 
                 printer.printText("           " + salesSlipType + "签购单         \n");
                 samllFormatLine(format, printer);
@@ -287,8 +286,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     printer.printText(Alignment.LEFT, item.optString("salesSlipKey") + ":" + item.optString("salesSlipValue") + "\n");
                 }
 
-//        printer.printText(Alignment.LEFT, "备注：");
-//        printer.feedLine(2);
                 printer.printText(Alignment.LEFT, "顾客签名：");
                 printer.feedLine(1);
                 samllFormat(format, printer);
@@ -298,7 +295,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
 
 // 打印图片
-//        printImg(context, printer);
+//        printImg(context, printer); printer.setFormat(format);
             }
 
             @Override
@@ -320,7 +317,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         }
 
     }
-
 
     /**
      * 销售小票
@@ -467,7 +463,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
             e.printStackTrace();
         }
     }
-
 
     /**
      * 销售总结
@@ -862,5 +857,162 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         }
     }
 
+    // 打印不同尺寸的字体
+    public void printFontASCIITemp(Context context, JSONArray args, CallbackContext callbackContext) {
+        progress = new Printer.Progress() {
+            @Override
+            public void doPrint(Printer printer) throws Exception {
+                // template 打印格式模板
+//        printer.setAutoTrunc(false);
+                Format format = new Format();
+
+                // 字母 scale=1x1
+
+                printExplain(format, printer, "ASCII", "1x1");
+                format.setAscScale(Format.ASC_SC1x1);
+                printAscTemplate(format, printer);
+
+                // 字母 scale=1x2
+                printExplain(format, printer, "ASCII", "1x2");
+                format.setAscScale(Format.ASC_SC1x2);
+                printAscTemplate(format, printer);
+
+                // 字母 scale=1x3
+                printExplain(format, printer, "ASCII", "1x3");
+                format.setAscScale(Format.ASC_SC1x3);
+                printAscTemplate(format, printer);
+
+                // 字母 scale=2x1
+                printExplain(format, printer, "ASCII", "2x1");
+                format.setAscScale(Format.ASC_SC2x1);
+                printAscTemplate(format, printer);
+
+                // 字母 scale=3x3
+                printExplain(format, printer, "ASCII", "3x1");
+                format.setAscScale(Format.ASC_SC3x1);
+                printAscTemplate(format, printer);
+
+                // 汉字 scale=1x1
+                printExplain(format, printer, "汉字", "1x1");
+                format.setHzScale(Format.HZ_SC1x1);
+                printFontTemplate(format, printer);
+
+
+                // 汉字 scale=1x2
+                printExplain(format, printer, "汉字", "1x2");
+                format.setHzScale(Format.HZ_SC1x2);
+                printFontTemplate(format, printer);
+
+                // 汉字 scale=1x3
+                printExplain(format, printer, "汉字", "1x3");
+                format.setHzScale(Format.HZ_SC1x3);
+                printFontTemplate(format, printer);
+
+                // 汉字 scale=2x1
+                printExplain(format, printer, "汉字", "2x1");
+                format.setHzScale(Format.HZ_SC2x1);
+                printFontTemplate(format, printer);
+
+                // 汉字 scale=3x1
+                printExplain(format, printer, "汉字", "3x1");
+                format.setHzScale(Format.HZ_SC3x1);
+                printFontTemplate(format, printer);
+
+                generalFormat(format, printer);
+                printer.printText(Alignment.CENTER, "此处以下是正常字体&ASCII\n");
+                printer.printText(Alignment.LEFT, "说明:\n");
+                printer.printText(Alignment.LEFT, "1.scale:字体与ASCII(字母,符号)的比例或者级别，scale=height*width\n");
+                printer.printText(Alignment.LEFT, "2.size:字体与ASCII(字母,符号)的可缩放尺寸，size=height*width\n");
+                printer.printText(Alignment.LEFT, "3.打印的清晰度跟机器的版本，机器的电压，机器的卡槽与纸张吻合程度，打印纸张的质量等相关\n");
+
+                printer.feedLine(4);
+            }
+
+            @Override
+            public void onFinish(int i) {
+                printFinish(i, callbackContext);
+            }
+
+            @Override
+            public void onCrash() {
+
+            }
+        };
+
+        try {
+            Beeper.startBeep(100);
+            progress.start();
+        } catch (RequestException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    // 打印汉字模板
+    public void printFontTemplate(Format format, Printer printer) throws Exception {
+        format.setHzSize(Format.HZ_DOT24x24);
+        printer.setFormat(format);
+        printer.printText("华润置地华润置地华润 size=24x24\n");
+
+        format.setHzSize(Format.HZ_DOT16x16);
+        printer.setFormat(format);
+        printer.printText("华润置地华润置地华润 size=16x16\n");
+
+        format.setHzSize(Format.HZ_DOT24x16);
+        printer.setFormat(format);
+        printer.printText("华润置地华润置地华润 size=24x16\n");
+
+        format.setHzSize(Format.HZ_DOT32x24);
+        printer.setFormat(format);
+        printer.printText("华润置地华润置地华润 size=32x24\n");
+
+        samllFormat(format, printer);
+        printer.printText(Alignment.CENTER, "- - - - - - - - - - - - - - - - - - - - - - - - \n");
+        generalFormat(format, printer);
+    }
+
+    // 打印ASCII样式模板
+    public void printAscTemplate(Format format, Printer printer) throws Exception {
+        format.setAscSize(Format.ASC_DOT32x12);
+        printer.setFormat(format);
+        printer.printText("AAAaaaBBBbbbCCCccc size=32x12\n");
+
+        format.setAscSize(Format.ASC_DOT24x12);
+        printer.setFormat(format);
+        printer.printText("AAAaaaBBBbbbCCCccc size=24x12\n");
+
+
+        format.setAscSize(Format.ASC_DOT7x7);
+        printer.setFormat(format);
+        printer.printText("AAAaaaBBBbbbCCCccc size=7x7\n");
+
+        format.setAscSize(Format.ASC_DOT5x7);
+        printer.setFormat(format);
+        printer.printText("AAAaaaBBBbbbCCCccc size=5x7\n");
+
+        format.setAscSize(Format.ASC_DOT16x8);
+        printer.setFormat(format);
+        printer.printText("AAAaaaBBBbbbCCCccc size=6x8\n");
+        samllFormat(format, printer);
+        printer.printText(Alignment.CENTER, "- - - - - - - - - - - - - - - - - - - - - - - - \n");
+        generalFormat(format, printer);
+    }
+
+    // 打印样式解释
+    public void printExplain(Format format, Printer printer, String type, String scale) {
+        // 正常 ASC_SC1x2
+//    format.setAscScale(Format.ASC_SC1x1);
+//    format.setAscSize(Format.ASC_DOT24x12);
+//    format.setHzScale(Format.HZ_SC1x1);
+//    format.setHzSize(Format.HZ_DOT24x24);
+
+        try {
+//      printer.setFormat(format);
+            generalFormat(format, printer);
+            printer.printText(Alignment.CENTER, "==" + type + " scale=" + scale + ",size=?x?==\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -31,7 +31,6 @@ public class A8ResPlugin extends CordovaPlugin {
     com.ttebd.a8ResPlugin.PrinterMain printerMain = new com.ttebd.a8ResPlugin.PrinterMain();
     private static Activity activity = null;
 
-
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
@@ -40,7 +39,6 @@ public class A8ResPlugin extends CordovaPlugin {
             Log.d("a8ResPlugin", "初始化！");
             logUtil.info("a8ResPlugin", "初始化！");
         }
-
 
         // 日志调用
         try {
@@ -51,19 +49,19 @@ public class A8ResPlugin extends CordovaPlugin {
                         switch (action) {
                             case "logInfo":
                                 JSONObject infoMessage = args.getJSONObject(0);
-                                logUtil.info(infoMessage.getString("tag"), infoMessage.getString("message"));
+                                logUtil.info(infoMessage.optString("tag"), infoMessage.optString("message"));
                                 break;
                             case "logDebug":
                                 JSONObject debugMessage = args.getJSONObject(0);
-                                logUtil.debug(debugMessage.getString("tag"), debugMessage.getString("message"));
+                                logUtil.debug(debugMessage.optString("tag"), debugMessage.optString("message"));
                                 break;
                             case "logWarn":
                                 JSONObject warnMessage = args.getJSONObject(0);
-                                logUtil.warn(warnMessage.getString("tag"), warnMessage.getString("message"));
+                                logUtil.warn(warnMessage.optString("tag"), warnMessage.optString("message"));
                                 break;
                             case "logError":
                                 JSONObject errorMessage = args.getJSONObject(0);
-                                logUtil.error(errorMessage.getString("tag"), errorMessage.getString("message"));
+                                logUtil.error(errorMessage.optString("tag"), errorMessage.optString("message"));
                                 break;
                             default:
                                 logUtil.error("插件调用", "没有找到此方法");
@@ -73,6 +71,8 @@ public class A8ResPlugin extends CordovaPlugin {
                     }
                 }
             };
+            cordova.getThreadPool().execute(logRb);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,32 +82,40 @@ public class A8ResPlugin extends CordovaPlugin {
             Runnable rb = new Runnable() {
                 @Override
                 public void run() {
-                    bindDeviceService(activity.getApplicationContext());
+
                     try {
                         switch (action) {
                             case "printReturnGood":
+                                bindDeviceService(activity.getApplicationContext());
                                 printerMain.printReturnGood(activity.getApplicationContext(), args, callbackContext);
                                 break;
                             case "printSalesReport":
+                                bindDeviceService(activity.getApplicationContext());
                                 printerMain.printSalesReport(activity.getApplicationContext(), args, callbackContext);
                                 break;
                             case "printSalesSlip":
+                                bindDeviceService(activity.getApplicationContext());
                                 printerMain.printSalesSlip(activity.getApplicationContext(), args, callbackContext);
                                 break;
                             case "printSalesSmallSummary":
+                                bindDeviceService(activity.getApplicationContext());
                                 printerMain.printSalesSmallSummary(activity.getApplicationContext(), args, callbackContext);
                                 break;
                             case "printSales":
+                                bindDeviceService(activity.getApplicationContext());
                                 printerMain.printSales(activity.getApplicationContext(), args, callbackContext);
+//                                unbindDeviceService();
                                 break;
                             case "printSalesSummary":
+                                bindDeviceService(activity.getApplicationContext());
                                 printerMain.printSalesSummary(activity.getApplicationContext(), args, callbackContext);
                                 break;
                         }
                     } catch (Exception e) {
-
+                        unbindDeviceService();
                     } finally {
 //                        unbindDeviceService();
+
                     }
                 }
             };
