@@ -28,7 +28,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
     private Printer printer = Printer.getInstance();
     com.ttebd.a8ResPlugin.LogUtil logUtil = new com.ttebd.a8ResPlugin.LogUtil();
 
-
     /**
      * 退货小票
      *
@@ -269,7 +268,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 JSONArray salesSlip = params.getJSONArray("salesSlip");
                 String salesSlipType = params.optString("salesSlipType");
 
-//      * 设置打印格式
+//        * 设置打印格式
                 Format format = new Format();
 //        * 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题
                 format.setAscSize(Format.ASC_DOT7x7);
@@ -293,8 +292,9 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 printer.feedLine(3);
                 generalFormat(format, printer);
 
+//                printFontASCIITemp(context, args, callbackContext);
 
-// 打印图片
+  //  打印图片
 //        printImg(context, printer); printer.setFormat(format);
             }
 
@@ -315,7 +315,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         } catch (RequestException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -679,7 +678,6 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         }
     }
 
-
     // 打印logo
     public static void printImg(Context context, Printer printer) {
         //        头部图片
@@ -863,7 +861,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
             @Override
             public void doPrint(Printer printer) throws Exception {
                 // template 打印格式模板
-//        printer.setAutoTrunc(false);
+                printer.setAutoTrunc(false);
                 Format format = new Format();
 
                 // 字母 scale=1x1
