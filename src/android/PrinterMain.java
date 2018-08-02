@@ -343,7 +343,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 JSONArray qrCode = params.getJSONArray("arCode");
                 JSONArray barCode = params.getJSONArray("barCode");
                 JSONArray tips = params.getJSONArray("tips");
-                JSONArray payLists = params.getJSONArray("payLists");
+                JSONArray saleSlipLists = params.getJSONArray("saleSlipLists");
 //        JSONArray salesSlips = params.getJSONArray("salesSlips");
                 String reprint = params.optString("reprint");
 

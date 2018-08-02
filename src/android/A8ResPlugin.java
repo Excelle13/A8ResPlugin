@@ -73,7 +73,7 @@ public class A8ResPlugin extends CordovaPlugin {
                     }
                 };
                 cordova.getThreadPool().execute(logRb);
-                return true;
+//                return true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -154,6 +154,4 @@ public class A8ResPlugin extends CordovaPlugin {
             callbackContext.error("Expected one non-empty string argument.");
         }
     }
-
-
 }
