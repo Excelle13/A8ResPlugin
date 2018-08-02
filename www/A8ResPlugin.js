@@ -37,6 +37,9 @@ exports.printSalesReport = function (arg0, success, error) {
 exports.printSalesSlip = function (arg0, success, error) {
     exec(success, error, 'A8ResPlugin', 'printSalesSlip', [arg0]);
 };
+exports.printResRelease = function (arg0, success, error) {
+    exec(success, error, 'A8ResPlugin', 'printResRelease', [arg0]);
+};
 
 
 

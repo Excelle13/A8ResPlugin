@@ -41,88 +41,97 @@ public class A8ResPlugin extends CordovaPlugin {
         }
 
         // 日志调用
-        try {
-            Runnable logRb = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        switch (action) {
-                            case "logInfo":
-                                JSONObject infoMessage = args.getJSONObject(0);
-                                logUtil.info(infoMessage.optString("tag"), infoMessage.optString("message"));
-                                break;
-                            case "logDebug":
-                                JSONObject debugMessage = args.getJSONObject(0);
-                                logUtil.debug(debugMessage.optString("tag"), debugMessage.optString("message"));
-                                break;
-                            case "logWarn":
-                                JSONObject warnMessage = args.getJSONObject(0);
-                                logUtil.warn(warnMessage.optString("tag"), warnMessage.optString("message"));
-                                break;
-                            case "logError":
-                                JSONObject errorMessage = args.getJSONObject(0);
-                                logUtil.error(errorMessage.optString("tag"), errorMessage.optString("message"));
-                                break;
-                            default:
-                                logUtil.error("插件调用", "没有找到此方法");
+        if (action.indexOf("log") == 0) {
+            try {
+                Runnable logRb = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            switch (action) {
+                                case "logInfo":
+                                    JSONObject infoMessage = args.getJSONObject(0);
+                                    logUtil.info(infoMessage.optString("tag"), infoMessage.optString("message"));
+                                    break;
+                                case "logDebug":
+                                    JSONObject debugMessage = args.getJSONObject(0);
+                                    logUtil.debug(debugMessage.optString("tag"), debugMessage.optString("message"));
+                                    break;
+                                case "logWarn":
+                                    JSONObject warnMessage = args.getJSONObject(0);
+                                    logUtil.warn(warnMessage.optString("tag"), warnMessage.optString("message"));
+                                    break;
+                                case "logError":
+                                    JSONObject errorMessage = args.getJSONObject(0);
+                                    logUtil.error(errorMessage.optString("tag"), errorMessage.optString("message"));
+                                    break;
+                                default:
+                                    logUtil.error("log调用", "没有找到此方法");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
-            };
-            cordova.getThreadPool().execute(logRb);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+                };
+                cordova.getThreadPool().execute(logRb);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
         // 打印调用
-        try {
-            Runnable rb = new Runnable() {
-                @Override
-                public void run() {
 
-                    try {
-                        switch (action) {
-                            case "printReturnGood":
-                                bindDeviceService(activity.getApplicationContext());
-                                printerMain.printReturnGood(activity.getApplicationContext(), args, callbackContext);
-                                break;
-                            case "printSalesReport":
-                                bindDeviceService(activity.getApplicationContext());
-                                printerMain.printSalesReport(activity.getApplicationContext(), args, callbackContext);
-                                break;
-                            case "printSalesSlip":
-                                bindDeviceService(activity.getApplicationContext());
-                                printerMain.printSalesSlip(activity.getApplicationContext(), args, callbackContext);
-                                break;
-                            case "printSalesSmallSummary":
-                                bindDeviceService(activity.getApplicationContext());
-                                printerMain.printSalesSmallSummary(activity.getApplicationContext(), args, callbackContext);
-                                break;
-                            case "printSales":
-                                bindDeviceService(activity.getApplicationContext());
-                                printerMain.printSales(activity.getApplicationContext(), args, callbackContext);
+        if (action.indexOf("print") == 0) {
+            try {
+                Runnable rb = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            switch (action) {
+                                case "printReturnGood":
+                                    bindDeviceService(activity.getApplicationContext());
+                                    printerMain.printReturnGood(activity.getApplicationContext(), args, callbackContext);
+                                    break;
+                                case "printSalesReport":
+                                    bindDeviceService(activity.getApplicationContext());
+                                    printerMain.printSalesReport(activity.getApplicationContext(), args, callbackContext);
+                                    break;
+                                case "printSalesSlip":
+                                    bindDeviceService(activity.getApplicationContext());
+                                    printerMain.printSalesSlip(activity.getApplicationContext(), args, callbackContext);
+                                    break;
+                                case "printSalesSmallSummary":
+                                    bindDeviceService(activity.getApplicationContext());
+                                    printerMain.printSalesSmallSummary(activity.getApplicationContext(), args, callbackContext);
+                                    break;
+                                case "printSales":
+                                    bindDeviceService(activity.getApplicationContext());
+                                    printerMain.printSales(activity.getApplicationContext(), args, callbackContext);
 //                                unbindDeviceService();
-                                break;
-                            case "printSalesSummary":
-                                bindDeviceService(activity.getApplicationContext());
-                                printerMain.printSalesSummary(activity.getApplicationContext(), args, callbackContext);
-                                break;
-                        }
-                    } catch (Exception e) {
-                        unbindDeviceService();
-                    } finally {
+                                    break;
+                                case "printSalesSummary":
+                                    bindDeviceService(activity.getApplicationContext());
+                                    printerMain.printSalesSummary(activity.getApplicationContext(), args, callbackContext);
+                                    break;
+                                case "printResRelease":
+                                    unbindDeviceService();
+                                    break;
+                                default:
+                                    logUtil.error("打印调用", "没有找到此方法");
+
+                            }
+                        } catch (Exception e) {
+                            unbindDeviceService();
+                        } finally {
 //                        unbindDeviceService();
 
+                        }
                     }
-                }
-            };
-            cordova.getThreadPool().execute(rb);
-            return true;
-        } catch (Exception e) {
-            logUtil.debug("JsInterface (Exception)", e.getLocalizedMessage());
+                };
+                cordova.getThreadPool().execute(rb);
+                return true;
+            } catch (Exception e) {
+                logUtil.debug("JsInterface (Exception)", e.getLocalizedMessage());
+            }
         }
 
         return false;

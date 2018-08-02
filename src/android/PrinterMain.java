@@ -63,7 +63,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
 // 打印图片
                 printImg(context, printer);
-                printer.printText("              退货             \n");
+                printer.printText(Alignment.CENTER,"退货\n");
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -142,8 +142,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     JSONObject item = tips.getJSONObject(i);
                     printer.printText(Alignment.LEFT, item.optString("tipsId") + "." + item.optString("article") + "\n");
                 }
+                samllFormat(format, printer);
+                printer.printText(Alignment.CENTER, "- - - - - - x - - - - - - - - - - - x - - - - - \n");
 
-                printer.feedLine(5);
+                printer.feedLine(3);
                 generalFormat(format, printer);
             }
 
@@ -272,6 +274,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 Format format = new Format();
 //        * 西文字符打印， 此处使用 5x7点， 1倍宽&&2倍高打印签购单标题
                 format.setAscSize(Format.ASC_DOT7x7);
+
                 format.setAscScale(Format.ASC_SC1x2);
 
                 generalFormat(format, printer);
@@ -294,7 +297,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
 //                printFontASCIITemp(context, args, callbackContext);
 
-  //  打印图片
+                //  打印图片
 //        printImg(context, printer); printer.setFormat(format);
             }
 
@@ -340,6 +343,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 JSONArray qrCode = params.getJSONArray("arCode");
                 JSONArray barCode = params.getJSONArray("barCode");
                 JSONArray tips = params.getJSONArray("tips");
+                JSONArray payLists = params.getJSONArray("payLists");
+//        JSONArray salesSlips = params.getJSONArray("salesSlips");
                 String reprint = params.optString("reprint");
 
 
@@ -350,6 +355,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 printImg(context, printer);
+                printer.printText(Alignment.CENTER, "销售单\n");
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -422,6 +428,26 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 //        printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
 
 
+// 签购单
+                if (payLists.length() > 0) {
+                    samllFormat(format, printer);
+                    for (int i = 0; i < payLists.length(); i++) {
+                        JSONObject item = payLists.getJSONObject(i);
+                        printer.printText(Alignment.CENTER, item.optString("salesSlipType")+"\n");
+                        JSONArray saleSlipArray = item.getJSONArray("salesSlip");
+
+                        for (int x = 0; x < saleSlipArray.length(); x++) {
+                            JSONObject itemJ = saleSlipArray.getJSONObject(x);
+                            printer.printText(String.format("%-" + (10 + formatPrintText(itemJ.optString("salesSlipKey"))) + "s%5s%24s", itemJ.optString("salesSlipKey"), itemJ.optString("paymentMethod"), itemJ.optString("salesSlipValue")));
+                            printer.printText("\n");
+                        }
+                        printer.printText(Alignment.LEFT, "顾客签名：\n");
+                        printer.feedLine(2);
+                        samllFormatLine(format, printer);
+                    }
+                }
+
+// 二维码
                 for (int i = 0; i < qrCode.length(); i++) {
                     JSONObject item = qrCode.getJSONObject(i);
                     printer.printQrCode(40,
@@ -430,13 +456,15 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     samllSamllFormat(format, printer);
                     printer.printText(Alignment.CENTER, item.optString("qrTitle") + "\n");
                 }
+
                 samllFormatLine(format, printer);
-                // tips
+// tips
                 samllSamllFormat(format, printer);
                 for (int i = 0; i < tips.length(); i++) {
                     JSONObject item = tips.getJSONObject(i);
                     printer.printText(Alignment.LEFT, item.optString("tipsId") + "." + item.optString("article") + "\n");
                 }
+
 //        printer.printQrCode(0,);
                 samllFormat(format, printer);
                 printer.printText(Alignment.CENTER, "- - - - - - x - - - - - - - - - - - x - - - - - \n");
