@@ -200,7 +200,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                 printImg(context, printer);
 
-                printer.printText(Alignment.CENTER,"销售报表\n");
+                printer.printText(Alignment.CENTER, "销售报表\n");
                 // 重印
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
@@ -729,7 +729,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
         //        头部图片
         InputStream in = null;
         try {
-            in = context.getResources().getAssets().open("mixc.bmp");
+            in = context.getResources().getAssets().open("www/assets/mixc.bmp");
             printer.printImage(0, in);
 
         } catch (Exception e) {
