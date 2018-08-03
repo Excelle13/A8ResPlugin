@@ -63,7 +63,9 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
 // 打印图片
                 printImg(context, printer);
-                printer.printText(Alignment.CENTER,"退货\n");
+                printer.printText(Alignment.CENTER, "退货\n");
+
+                // 重印
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -197,7 +199,9 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 printImg(context, printer);
-                printer.printText("            销售报表            \n");
+
+                printer.printText(Alignment.CENTER,"销售报表\n");
+                // 重印
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -278,8 +282,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 generalFormat(format, printer);
-
-                printer.printText("           " + salesSlipType + "签购单         \n");
+                printer.printText(Alignment.CENTER, salesSlipType + "签购单\n");
                 samllFormatLine(format, printer);
 
                 generalFormat(format, printer);
@@ -356,6 +359,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                 printImg(context, printer);
                 printer.printText(Alignment.CENTER, "销售单\n");
+                // 重印
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -425,20 +429,19 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                     printer.printText("\n");
                 }
                 samllFormatLine(format, printer);
-//        printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
 
 
 // 签购单
-                if (payLists.length() > 0) {
+                if (saleSlipLists.length() > 0) {
                     samllFormat(format, printer);
-                    for (int i = 0; i < payLists.length(); i++) {
-                        JSONObject item = payLists.getJSONObject(i);
-                        printer.printText(Alignment.CENTER, item.optString("salesSlipType")+"\n");
+                    for (int i = 0; i < saleSlipLists.length(); i++) {
+                        JSONObject item = saleSlipLists.getJSONObject(i);
+                        printer.printText(Alignment.CENTER, item.optString("salesSlipType") + "\n");
                         JSONArray saleSlipArray = item.getJSONArray("salesSlip");
 
                         for (int x = 0; x < saleSlipArray.length(); x++) {
                             JSONObject itemJ = saleSlipArray.getJSONObject(x);
-                            printer.printText(String.format("%-" + (10 + formatPrintText(itemJ.optString("salesSlipKey"))) + "s%5s%24s", itemJ.optString("salesSlipKey"), itemJ.optString("paymentMethod"), itemJ.optString("salesSlipValue")));
+                            printer.printText(String.format("%-" + (8 + formatPrintText(itemJ.optString("salesSlipKey"))) + "s%5s%24s", itemJ.optString("salesSlipKey"), itemJ.optString("paymentMethod"), itemJ.optString("salesSlipValue")));
                             printer.printText("\n");
                         }
                         printer.printText(Alignment.LEFT, "顾客签名：\n");
@@ -448,9 +451,10 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 }
 
 // 二维码
+                generalFormat(format, printer);
                 for (int i = 0; i < qrCode.length(); i++) {
                     JSONObject item = qrCode.getJSONObject(i);
-                    printer.printQrCode(40,
+                    printer.printQrCode(65,
                             new QrCode(item.optString("qrValue"), ECLEVEL_Q),
                             300);
                     samllSamllFormat(format, printer);
@@ -521,7 +525,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 printImg(context, printer);
 //        printer.printText(Alignment.CENTER, "============销售总结============\n");
 //        printer.printText("============销售总结============\n");
-                printer.printText("            销售总结            \n");
+                printer.printText(Alignment.CENTER, "销售总结\n");
+                // 重印
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
@@ -547,7 +552,8 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 for (int i = 0; i < saleSummaries.length(); i++) {
                     JSONObject item = saleSummaries.getJSONObject(i);
                     JSONArray bill = item.getJSONArray("bill");
-                    String billMachine = item.getString("billMachine");
+                    String billType = item.getString("billType");
+                    String billObject = item.getString("billObject");
                     String billTotal = item.getString("billTotal");
                     JSONArray payment = item.getJSONArray("payment");
                     String paymentTotal = item.getString("paymentTotal");
@@ -555,7 +561,7 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
 
                     samllFormatLine(format, printer);
                     generalFormat(format, printer);
-                    printer.printText(String.format("%-12s%14s", "收银机", billMachine + "\n"));
+                    printer.printText(String.format("%-12s%14s", billType, billObject + "\n"));
                     printer.printText(String.format("%-8s%s%11s", "单据方式", "单据数量", "金额(RMB)\n"));
                     samllFormat(format, printer);
                     for (int y = 0; y < bill.length(); y++) {
@@ -636,14 +642,15 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 format.setAscScale(Format.ASC_SC1x2);
 
                 printImg(context, printer);
-                printer.printText("            销售小结            \n");
+                printer.printText(Alignment.CENTER, "销售小结\n");
+                // 重印
                 if (reprint.length() > 0) {
                     printer.printText(Alignment.CENTER, "【" + reprint + "】\n");
                 }
                 samllFormat(format, printer);
                 samllFormatLine(format, printer);
-                for (int i = 0; i < storeInfo.length(); i++) {
 
+                for (int i = 0; i < storeInfo.length(); i++) {
                     if (i == 0) {
                         JSONObject item = storeInfo.getJSONObject(i);
                         printer.printText(String.format("%-20s%18s", item.optString("storeInfoName"), item.optString("storeInfoValue")));
@@ -656,39 +663,50 @@ public class PrinterMain extends com.ttebd.a8ResPlugin.DeviceBase {
                 }
                 printDate(printer);
                 samllFormatLine(format, printer);
-                generalFormat(format, printer);
-                printer.printText(String.format("%-8s%s%11s", "单据方式", "单据数量", "金额(RMB)\n"));
-                samllFormat(format, printer);
-                for (int i = 0; i < bill.length(); i++) {
-                    JSONObject item = bill.getJSONObject(i);
-                    printer.printText(
-                            String.format("%-" + (15 + formatPrintText(item.optString("billType"))) + "s%7s%18s", item.optString("billType"), item.optString("billSum"), item.optString("billAmount")));
-                    printer.printText("\n");
+
+                // 单据方式
+                if (bill.length() > 0) {
+                    generalFormat(format, printer);
+                    printer.printText(String.format("%-8s%s%11s", "单据方式", "单据数量", "金额(RMB)\n"));
+                    samllFormat(format, printer);
+                    for (int i = 0; i < bill.length(); i++) {
+                        JSONObject item = bill.getJSONObject(i);
+                        printer.printText(
+                                String.format("%-" + (15 + formatPrintText(item.optString("billType"))) + "s%7s%18s", item.optString("billType"), item.optString("billSum"), item.optString("billAmount")));
+                        printer.printText("\n");
+                    }
+                    printer.printText(Alignment.RIGHT, "总计：" + billTotal + "\n");
+                    samllFormatLine(format, printer);
+                } else {
+                    logUtil.error("销售小结", "bill-单据方式 数组没有数据");
+                    callbackContext.error("bill 数组没有数据");
                 }
 
-                printer.printText(Alignment.RIGHT, "总计：" + billTotal + "\n");
-
-                samllFormatLine(format, printer);
-
                 generalFormat(format, printer);
-                printer.printText(String.format("%-8s%s%11s", "付款方式", "单据数量", "金额(RMB)\n"));
-                samllFormat(format, printer);
-                for (int i = 0; i < payment.length(); i++) {
-                    JSONObject item = payment.getJSONObject(i);
-                    printer.printText(String.format("%-" + (15 + formatPrintText(item.optString("paymentMethod"))) + "s%7s%18s", item.optString("paymentMethod"), item.optString("paymentSum"), item.optString("paymentAmount")));
-                    printer.printText("\n");
+
+// 付款方式
+                if (payment.length() > 0) {
+                    printer.printText(String.format("%-8s%s%11s", "付款方式", "单据数量", "金额(RMB)\n"));
+                    samllFormat(format, printer);
+                    for (int i = 0; i < payment.length(); i++) {
+                        JSONObject item = payment.getJSONObject(i);
+                        printer.printText(String.format("%-" + (15 + formatPrintText(item.optString("paymentMethod"))) + "s%7s%18s", item.optString("paymentMethod"), item.optString("paymentSum"), item.optString("paymentAmount")));
+                        printer.printText("\n");
+                    }
+                    printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
+                } else {
+                    logUtil.error("销售小结", "payment-付款方式 数组没有数据");
+                    callbackContext.error("payment 数组没有数据");
                 }
-                printer.printText(Alignment.RIGHT, "总计：" + paymentTotal + "\n");
 
+// 结束分割线
                 samllFormat(format, printer);
-
                 printer.printText(Alignment.CENTER, "- - - - - - x - - - - - - - - - - - x - - - - - \n");
-
                 printer.feedLine(3);
                 generalFormat(format, printer);
             }
 
-            //      @Override
+            @Override
             public void onFinish(int i) {
                 printFinish(i, callbackContext);
             }
